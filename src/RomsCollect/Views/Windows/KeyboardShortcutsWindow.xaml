@@ -1,0 +1,82 @@
+<!-- SPDX-License-Identifier: GPL-3.0-or-later -->
+<ui:FluentWindow x:Class="RomsCollect.Views.Windows.KeyboardShortcutsWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:loc="clr-namespace:RomsCollect.Helpers"
+        xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+        mc:Ignorable="d"
+        Title="{loc:LocalizedString Shortcuts.Title}"
+        Height="420" Width="420"
+        ResizeMode="NoResize"
+        WindowStartupLocation="CenterOwner"
+        ExtendsContentIntoTitleBar="True"
+        WindowBackdropType="Mica">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <ui:TitleBar Grid.Row="0" Title="{loc:LocalizedString Shortcuts.Title}" />
+
+        <StackPanel Grid.Row="1" Margin="24,8,24,8">
+            <Grid Margin="0,4">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="120" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Column="0" Text="Ctrl+W" FontWeight="SemiBold" />
+                <TextBlock Grid.Column="1" Text="{loc:LocalizedString Shortcuts.ToggleGridWheel}" />
+            </Grid>
+            <Grid Margin="0,4">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="120" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Column="0" Text="Ctrl+F" FontWeight="SemiBold" />
+                <TextBlock Grid.Column="1" Text="{loc:LocalizedString Shortcuts.FocusSearch}" />
+            </Grid>
+            <Grid Margin="0,4">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="120" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Column="0" Text="Ctrl+R" FontWeight="SemiBold" />
+                <TextBlock Grid.Column="1" Text="{loc:LocalizedString Shortcuts.OpenScan}" />
+            </Grid>
+            <Grid Margin="0,4">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="120" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Column="0" Text="F5" FontWeight="SemiBold" />
+                <TextBlock Grid.Column="1" Text="{loc:LocalizedString Shortcuts.PlaySelected}" />
+            </Grid>
+            <Grid Margin="0,4">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="120" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Column="0" Text="Ctrl+D" FontWeight="SemiBold" />
+                <TextBlock Grid.Column="1" Text="{loc:LocalizedString Shortcuts.ToggleFavoriteSelected}" />
+            </Grid>
+            <Grid Margin="0,4">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="120" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Column="0" Text="Ctrl+T" FontWeight="SemiBold" />
+                <TextBlock Grid.Column="1" Text="{loc:LocalizedString Shortcuts.ToggleCompletedSelected}" />
+            </Grid>
+        </StackPanel>
+
+        <ui:Button Grid.Row="2" Content="{loc:LocalizedString Shortcuts.Close}"
+                   Click="OnCloseClick"
+                   HorizontalAlignment="Right"
+                   Margin="24,8,24,16"
+                   Padding="20,8" />
+    </Grid>
+</ui:FluentWindow>

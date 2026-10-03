@@ -1,0 +1,49 @@
+<!-- SPDX-License-Identifier: GPL-3.0-or-later -->
+<ui:FluentWindow x:Class="RomsCollect.Views.Windows.AboutWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:loc="clr-namespace:RomsCollect.Helpers"
+        xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+        mc:Ignorable="d"
+        Title="{loc:LocalizedString About.Title}"
+        Height="380" Width="420"
+        ResizeMode="NoResize"
+        WindowStartupLocation="CenterOwner"
+        ExtendsContentIntoTitleBar="True"
+        WindowBackdropType="Mica">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <ui:TitleBar Grid.Row="0" Title="{loc:LocalizedString About.Title}" />
+
+        <StackPanel Grid.Row="1" Margin="32,8,32,24" HorizontalAlignment="Center" VerticalAlignment="Center">
+            <Image x:Name="LogoImage" Width="96" Height="96" Margin="0,0,0,16" Visibility="Collapsed" />
+
+            <TextBlock Text="RomsCollect" FontSize="22" FontWeight="Bold" HorizontalAlignment="Center" />
+            <TextBlock Text="{loc:LocalizedString About.Copyright}" HorizontalAlignment="Center" Margin="0,8,0,0" Opacity="0.8" />
+            <TextBlock Text="{loc:LocalizedString About.License}" HorizontalAlignment="Center" Margin="0,4,0,0" Opacity="0.8" TextWrapping="Wrap" TextAlignment="Center" />
+
+            <TextBlock HorizontalAlignment="Center" Margin="0,16,0,0">
+                <Hyperlink Click="OnContactEmailClick">
+                    <TextBlock Text="{loc:LocalizedString About.ContactEmail}" />
+                </Hyperlink>
+            </TextBlock>
+            <TextBlock HorizontalAlignment="Center" Margin="0,4,0,0">
+                <Hyperlink Click="OnWebsiteClick">
+                    <TextBlock Text="{loc:LocalizedString About.Website}" />
+                </Hyperlink>
+            </TextBlock>
+
+            <ui:Button Content="{loc:LocalizedString About.Close}"
+                       Click="OnCloseClick"
+                       HorizontalAlignment="Center"
+                       Margin="0,24,0,0"
+                       Padding="24,8" />
+        </StackPanel>
+    </Grid>
+</ui:FluentWindow>

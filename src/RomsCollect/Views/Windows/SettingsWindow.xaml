@@ -1,0 +1,226 @@
+<!-- SPDX-License-Identifier: GPL-3.0-or-later -->
+<ui:FluentWindow x:Class="RomsCollect.Views.Windows.SettingsWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:vm="clr-namespace:RomsCollect.ViewModels"
+        xmlns:loc="clr-namespace:RomsCollect.Helpers"
+        xmlns:conv="clr-namespace:RomsCollect.Converters"
+        xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+        mc:Ignorable="d"
+        Title="{loc:LocalizedString Settings.Title}"
+        Height="640" Width="560"
+        WindowStartupLocation="CenterOwner"
+        ExtendsContentIntoTitleBar="True"
+        WindowBackdropType="Mica"
+        d:DataContext="{d:DesignInstance Type=vm:SettingsViewModel}">
+    <ui:FluentWindow.Resources>
+        <conv:InverseBooleanConverter x:Key="InverseBooleanConverter" />
+        <conv:EnumToBooleanConverter x:Key="EnumToBooleanConverter" />
+        <conv:NullToVisibilityConverter x:Key="NullToVisibilityConverter" />
+    </ui:FluentWindow.Resources>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <ui:TitleBar Grid.Row="0" Title="{loc:LocalizedString Settings.Title}" />
+
+        <ScrollViewer Grid.Row="1" Margin="24,8,24,8">
+            <StackPanel>
+                <TextBlock Text="{loc:LocalizedString Settings.Language}" FontWeight="SemiBold" Margin="0,8,0,4" />
+                <ComboBox SelectedValue="{Binding Language}" SelectedValuePath="Content">
+                    <ComboBoxItem Content="en" />
+                </ComboBox>
+
+                <TextBlock Text="{loc:LocalizedString Settings.Theme}" FontWeight="SemiBold" Margin="0,16,0,4" />
+                <StackPanel Orientation="Horizontal">
+                    <RadioButton Content="{loc:LocalizedString Settings.Theme.Dark}"
+                                 IsChecked="{Binding IsDarkTheme}"
+                                 GroupName="Theme" Margin="0,0,16,0" />
+                    <RadioButton Content="{loc:LocalizedString Settings.Theme.Light}"
+                                 IsChecked="{Binding IsDarkTheme, Converter={StaticResource InverseBooleanConverter}}"
+                                 GroupName="Theme" />
+                </StackPanel>
+
+                <TextBlock Text="{loc:LocalizedString Settings.AccentColor}" FontWeight="SemiBold" Margin="0,16,0,4" />
+                <ui:TextBox Text="{Binding AccentColorHex}" />
+
+                <TextBlock Text="{loc:LocalizedString Settings.Paths}" FontWeight="SemiBold" Margin="0,20,0,4" />
+                <Grid Margin="0,4,0,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="140" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+
+                    <TextBlock Grid.Row="0" Grid.Column="0" Text="{loc:LocalizedString Settings.Paths.Roms}" Opacity="0.7" />
+                    <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding RomsDirectory}" TextTrimming="CharacterEllipsis" />
+
+                    <TextBlock Grid.Row="1" Grid.Column="0" Text="{loc:LocalizedString Settings.Paths.Media}" Opacity="0.7" Margin="0,4,0,0" />
+                    <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding MediaDirectory}" TextTrimming="CharacterEllipsis" Margin="0,4,0,0" />
+
+                    <TextBlock Grid.Row="2" Grid.Column="0" Text="{loc:LocalizedString Settings.Paths.Bios}" Opacity="0.7" Margin="0,4,0,0" />
+                    <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding BiosDirectory}" TextTrimming="CharacterEllipsis" Margin="0,4,0,0" />
+
+                    <TextBlock Grid.Row="3" Grid.Column="0" Text="{loc:LocalizedString Settings.Paths.Saves}" Opacity="0.7" Margin="0,4,0,0" />
+                    <TextBlock Grid.Row="3" Grid.Column="1" Text="{Binding SavesDirectory}" TextTrimming="CharacterEllipsis" Margin="0,4,0,0" />
+                </Grid>
+
+                <TextBlock Text="{loc:LocalizedString Settings.OnLaunch}" FontWeight="SemiBold" Margin="0,20,0,4" />
+                <StackPanel>
+                    <RadioButton Content="{loc:LocalizedString Settings.OnLaunch.Minimize}"
+                                 GroupName="LaunchBehavior"
+                                 IsChecked="{Binding LaunchBehavior, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static vm:GameLaunchBehavior.Minimize}}" />
+                    <RadioButton Content="{loc:LocalizedString Settings.OnLaunch.Close}"
+                                 GroupName="LaunchBehavior"
+                                 IsChecked="{Binding LaunchBehavior, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static vm:GameLaunchBehavior.Close}}"
+                                 Margin="0,4,0,0" />
+                    <RadioButton Content="{loc:LocalizedString Settings.OnLaunch.DoNothing}"
+                                 GroupName="LaunchBehavior"
+                                 IsChecked="{Binding LaunchBehavior, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static vm:GameLaunchBehavior.DoNothing}}"
+                                 Margin="0,4,0,0" />
+                </StackPanel>
+
+                <TextBlock Text="{loc:LocalizedString Settings.Display}" FontWeight="SemiBold" Margin="0,20,0,4" />
+                <CheckBox Content="{loc:LocalizedString Settings.Display.ShowSidebarGameCount}"
+                          IsChecked="{Binding ShowSidebarGameCount}" />
+
+                <TextBlock Text="{loc:LocalizedString Settings.Systems}" FontWeight="SemiBold" Margin="0,20,0,4" />
+                <ItemsControl ItemsSource="{Binding Systems}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Grid Margin="0,2">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <Image Grid.Column="0"
+                                       Source="{Binding IconFullPath}"
+                                       Width="18" Height="18"
+                                       Margin="0,0,8,0"
+                                       VerticalAlignment="Center"
+                                       Visibility="{Binding IconFullPath, Converter={StaticResource NullToVisibilityConverter}}" />
+                                <TextBlock Grid.Column="1" Text="{Binding Name}" VerticalAlignment="Center" />
+                                <ui:Button Grid.Column="2"
+                                           Content="{loc:LocalizedString Settings.System.Icon}"
+                                           Padding="8,2"
+                                           Margin="0,0,4,0"
+                                           Click="OnBrowseSystemIconClick" />
+                                <ui:Button Grid.Column="3"
+                                           Content="✕"
+                                           Padding="8,2"
+                                           Command="{Binding DataContext.RemoveSystemCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                           CommandParameter="{Binding}" />
+                            </Grid>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+
+                <Grid Margin="0,8,0,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <ui:TextBox Grid.Column="0" Text="{Binding NewSystemKey, UpdateSourceTrigger=PropertyChanged}" PlaceholderText="{loc:LocalizedString Settings.NewSystem.Key}" Margin="0,0,4,0" />
+                    <ui:TextBox Grid.Column="1" Text="{Binding NewSystemName, UpdateSourceTrigger=PropertyChanged}" PlaceholderText="{loc:LocalizedString Settings.NewSystem.Name}" Margin="0,0,4,0" />
+                    <ui:TextBox Grid.Column="2" Text="{Binding NewSystemExtensions, UpdateSourceTrigger=PropertyChanged}" PlaceholderText="{loc:LocalizedString Settings.NewSystem.Extensions}" Margin="0,0,4,0" />
+                    <ui:Button Grid.Column="3" Content="+" Command="{Binding AddSystemCommand}" Padding="12,2" />
+                </Grid>
+
+                <TextBlock Text="{loc:LocalizedString Settings.Emulators}" FontWeight="SemiBold" Margin="0,20,0,4" />
+                <TextBlock Text="{loc:LocalizedString Settings.Emulators.SelectSystem}" Margin="0,4,0,4" />
+                <ComboBox ItemsSource="{Binding Systems}" SelectedItem="{Binding SelectedEmulatorSystem}" DisplayMemberPath="Name" />
+
+                <ItemsControl ItemsSource="{Binding EmulatorProfiles}" Margin="0,8,0,0">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Grid Margin="0,2">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Grid.Column="0" VerticalAlignment="Center">
+                                    <Run Text="{Binding Name, Mode=OneWay}" />
+                                    <Run Text=" ★" FontWeight="Bold">
+                                        <Run.Style>
+                                            <Style TargetType="Run">
+                                                <Setter Property="Foreground" Value="Transparent" />
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding IsDefault}" Value="True">
+                                                        <Setter Property="Foreground" Value="#FFD700" />
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Run.Style>
+                                    </Run>
+                                </TextBlock>
+                                <ui:Button Grid.Column="1"
+                                           Content="{loc:LocalizedString Settings.Emulators.SetDefault}"
+                                           Padding="8,2" Margin="0,0,4,0"
+                                           Command="{Binding DataContext.SetDefaultEmulatorProfileCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                           CommandParameter="{Binding}" />
+                                <ui:Button Grid.Column="2"
+                                           Content="✕"
+                                           Padding="8,2"
+                                           Command="{Binding DataContext.RemoveEmulatorProfileCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                           CommandParameter="{Binding}" />
+                            </Grid>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+                <TextBlock Text="{loc:LocalizedString Settings.Emulators.NoneConfigured}" Opacity="0.6" Margin="0,4,0,0">
+                    <TextBlock.Style>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="Visibility" Value="Collapsed" />
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding EmulatorProfiles.Count}" Value="0">
+                                    <Setter Property="Visibility" Value="Visible" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </TextBlock.Style>
+                </TextBlock>
+
+                <TextBlock Text="{loc:LocalizedString Settings.Emulators.Preset}" Margin="0,12,0,4" />
+                <ComboBox ItemsSource="{Binding EmulatorPresets}" SelectedItem="{Binding SelectedEmulatorPreset}" DisplayMemberPath="Name" />
+
+                <TextBlock Text="{loc:LocalizedString Settings.Emulators.ProfileName}" Margin="0,12,0,4" />
+                <ui:TextBox Text="{Binding NewEmulatorProfileName, UpdateSourceTrigger=PropertyChanged}" />
+
+                <TextBlock Text="{loc:LocalizedString Settings.Emulators.ExecutablePath}" Margin="0,12,0,4" />
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <ui:TextBox Grid.Column="0" Text="{Binding NewEmulatorExecutablePath, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,4,0" />
+                    <ui:Button Grid.Column="1" Content="{loc:LocalizedString Settings.Emulators.BrowseExecutable}" Click="OnBrowseEmulatorExecutableClick" Padding="12,4" />
+                </Grid>
+
+                <TextBlock Text="{loc:LocalizedString Settings.Emulators.CommandLineTemplate}" Margin="0,12,0,4" />
+                <ui:TextBox Text="{Binding NewEmulatorCommandLineTemplate, UpdateSourceTrigger=PropertyChanged}" />
+
+                <ui:Button Content="{loc:LocalizedString Settings.Emulators.Add}" Command="{Binding AddEmulatorProfileCommand}" Margin="0,12,0,0" Padding="16,6" HorizontalAlignment="Left" />
+            </StackPanel>
+        </ScrollViewer>
+
+        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="24,8,24,16">
+            <ui:Button Content="{loc:LocalizedString Settings.Cancel}" Click="OnCancelClick" Margin="0,0,8,0" Padding="20,8" />
+            <ui:Button Content="{loc:LocalizedString Settings.Save}" Appearance="Primary" Click="OnSaveClick" Padding="20,8" />
+        </StackPanel>
+    </Grid>
+</ui:FluentWindow>

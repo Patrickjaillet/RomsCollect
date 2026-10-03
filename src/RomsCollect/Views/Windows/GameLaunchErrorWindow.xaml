@@ -1,0 +1,33 @@
+<!-- SPDX-License-Identifier: GPL-3.0-or-later -->
+<ui:FluentWindow x:Class="RomsCollect.Views.Windows.GameLaunchErrorWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:loc="clr-namespace:RomsCollect.Helpers"
+        xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+        mc:Ignorable="d"
+        Title="{loc:LocalizedString GameLaunch.ErrorTitle}"
+        Height="220" Width="440"
+        ResizeMode="NoResize"
+        WindowStartupLocation="CenterOwner"
+        ExtendsContentIntoTitleBar="True"
+        WindowBackdropType="Mica">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <ui:TitleBar Grid.Row="0" Title="{loc:LocalizedString GameLaunch.ErrorTitle}" />
+
+        <TextBlock x:Name="MessageText" Grid.Row="1" Margin="24,12,24,8" TextWrapping="Wrap" VerticalAlignment="Top" />
+
+        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="24,8,24,16">
+            <ui:Button x:Name="OpenSettingsButton" Content="{loc:LocalizedString GameLaunch.OpenSettings}"
+                       Click="OnOpenSettingsClick" Padding="16,8" Margin="0,0,8,0" Visibility="Collapsed" />
+            <ui:Button Content="{loc:LocalizedString GameLaunch.Close}" Appearance="Primary" Click="OnCloseClick" Padding="20,8" />
+        </StackPanel>
+    </Grid>
+</ui:FluentWindow>

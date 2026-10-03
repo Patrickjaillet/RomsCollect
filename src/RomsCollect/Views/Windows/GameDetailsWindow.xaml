@@ -1,0 +1,243 @@
+<!-- SPDX-License-Identifier: GPL-3.0-or-later -->
+<ui:FluentWindow x:Class="RomsCollect.Views.Windows.GameDetailsWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:vm="clr-namespace:RomsCollect.ViewModels"
+        xmlns:loc="clr-namespace:RomsCollect.Helpers"
+        xmlns:conv="clr-namespace:RomsCollect.Converters"
+        xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+        mc:Ignorable="d"
+        Title="{loc:LocalizedString GameDetails.Title}"
+        Height="760" Width="680"
+        WindowStartupLocation="CenterOwner"
+        ExtendsContentIntoTitleBar="True"
+        WindowBackdropType="Mica"
+        d:DataContext="{d:DesignInstance Type=vm:GameDetailsViewModel}">
+    <ui:FluentWindow.Resources>
+        <conv:NullToVisibilityConverter x:Key="NullToVisibilityConverter" />
+        <conv:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+    </ui:FluentWindow.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <ui:TitleBar Grid.Row="0" Title="{Binding Game.Title}" />
+
+        <ScrollViewer Grid.Row="1" Margin="24,8">
+            <StackPanel>
+                <!-- Fanart banner with the Clear Logo overlaid, same visual language as the quick detail panel -->
+                <Grid Height="140" ClipToBounds="True" Margin="0,0,0,8">
+                    <Image Source="{Binding FanartBackgroundImagePath}"
+                           Stretch="UniformToFill"
+                           Visibility="{Binding FanartBackgroundImagePath, Converter={StaticResource NullToVisibilityConverter}}" />
+                    <Rectangle Fill="#66000000" Visibility="{Binding FanartBackgroundImagePath, Converter={StaticResource NullToVisibilityConverter}}" />
+                    <Image Source="{Binding ClearLogoImagePath}"
+                           Stretch="Uniform"
+                           MaxHeight="90"
+                           HorizontalAlignment="Left"
+                           Margin="16"
+                           Visibility="{Binding ClearLogoImagePath, Converter={StaticResource NullToVisibilityConverter}}" />
+                </Grid>
+
+                <Grid Margin="0,0,0,16">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <StackPanel Grid.Column="0">
+                        <TextBlock Text="{Binding Game.Title}" FontSize="24" FontWeight="Bold" />
+                        <TextBlock Text="{Binding SystemName}" Opacity="0.7" Margin="0,4,0,0" />
+                    </StackPanel>
+                    <ui:Button Grid.Column="1" Content="{loc:LocalizedString Detail.Play}"
+                               Appearance="Primary" Icon="{ui:SymbolIcon Play24}"
+                               Command="{Binding PlayCommand}"
+                               VerticalAlignment="Bottom" Padding="20,8" />
+                </Grid>
+
+                <!-- Media gallery: main preview (image or video) + clickable thumbnail strip -->
+                <Border Height="260" CornerRadius="6" ClipToBounds="True" Margin="0,0,0,4"
+                        Background="{DynamicResource ControlFillColorDefaultBrush}">
+                    <Grid>
+                        <Image Source="{Binding SelectedGalleryImagePath}"
+                               Stretch="Uniform"
+                               Visibility="{Binding VideoPath, Converter={StaticResource NullToVisibilityConverter}, ConverterParameter=Invert}" />
+
+                        <Grid Visibility="{Binding VideoPath, Converter={StaticResource NullToVisibilityConverter}}">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="*" />
+                                <RowDefinition Height="Auto" />
+                            </Grid.RowDefinitions>
+
+                            <MediaElement x:Name="VideoPlayer"
+                                          Grid.Row="0"
+                                          Source="{Binding VideoPath}"
+                                          LoadedBehavior="Manual"
+                                          UnloadedBehavior="Manual"
+                                          Stretch="Uniform"
+                                          MediaOpened="OnVideoMediaOpened"
+                                          MediaEnded="OnVideoMediaEnded" />
+
+                            <StackPanel Grid.Row="1" Orientation="Horizontal" Background="#AA000000">
+                                <ui:Button x:Name="VideoPlayPauseButton"
+                                           Icon="{ui:SymbolIcon Play24}"
+                                           Click="OnVideoPlayPauseClick"
+                                           Padding="8" Margin="4" />
+                                <Slider x:Name="VideoScrubber"
+                                        Width="220" VerticalAlignment="Center" Minimum="0"
+                                        PreviewMouseDown="OnVideoScrubberPreviewMouseDown"
+                                        PreviewMouseUp="OnVideoScrubberPreviewMouseUp" />
+                            </StackPanel>
+                        </Grid>
+                    </Grid>
+                </Border>
+
+                <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled" Margin="0,0,0,8">
+                    <ItemsControl ItemsSource="{Binding GalleryImages}">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <StackPanel Orientation="Horizontal" />
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Border Width="100" Height="60" Margin="0,0,8,0" CornerRadius="4" ClipToBounds="True"
+                                        Cursor="Hand" MouseLeftButtonUp="OnGalleryThumbnailClick">
+                                    <Image Source="{Binding}" Stretch="UniformToFill" />
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </ScrollViewer>
+
+                <!-- Personal rating, editable directly without reopening the edit dialog -->
+                <TextBlock Text="{loc:LocalizedString GameDetails.Rating}" FontWeight="SemiBold" Margin="0,0,0,4" />
+                <Slider Minimum="0" Maximum="10" TickFrequency="1" IsSnapToTickEnabled="True"
+                        Value="{Binding Rating}" Width="220" HorizontalAlignment="Left" Margin="0,0,0,20" />
+
+                <!-- Description: rendered from the lightweight markup (**bold**, *italic*, "- " bullets)
+                     the edit dialog's Description tab can insert, via LightweightMarkupParser in code-behind. -->
+                <TextBlock Text="{loc:LocalizedString GameDetails.Description}" FontWeight="SemiBold" Margin="0,0,0,4" />
+                <TextBlock x:Name="DescriptionTextBlock" TextWrapping="Wrap" Margin="0,0,0,20" />
+
+                <!-- Download links -->
+                <TextBlock Text="{loc:LocalizedString GameDetails.DownloadLinks}" FontWeight="SemiBold" Margin="0,0,0,4" />
+                <TextBlock Text="{loc:LocalizedString GameDetails.DownloadLinks.NoLinks}" Opacity="0.6" Margin="0,0,0,8">
+                    <TextBlock.Style>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="Visibility" Value="Collapsed" />
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding DownloadLinks.Count}" Value="0">
+                                    <Setter Property="Visibility" Value="Visible" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </TextBlock.Style>
+                </TextBlock>
+                <ItemsControl ItemsSource="{Binding DownloadLinks}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Grid Margin="0,2">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Grid.Column="0" Text="{Binding Label}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" />
+                                <ui:Button Grid.Column="1" Content="{loc:LocalizedString GameDetails.DownloadLinks.Open}" Padding="12,4" Margin="0,0,4,0"
+                                           Command="{Binding DataContext.OpenDownloadLinkCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                           CommandParameter="{Binding}" />
+                                <ui:Button Grid.Column="2" Content="✕" Padding="8,4"
+                                           Command="{Binding DataContext.RemoveDownloadLinkCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                           CommandParameter="{Binding}" />
+                            </Grid>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+                <Grid Margin="0,8,0,20">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <ui:TextBox Grid.Column="0" Text="{Binding NewLinkLabel, UpdateSourceTrigger=PropertyChanged}"
+                                PlaceholderText="{loc:LocalizedString GameDetails.DownloadLinks.Label}" Margin="0,0,4,0" />
+                    <ui:TextBox Grid.Column="1" Text="{Binding NewLinkUrl, UpdateSourceTrigger=PropertyChanged}"
+                                PlaceholderText="{loc:LocalizedString GameDetails.DownloadLinks.Url}" Margin="0,0,4,0" />
+                    <ui:Button Grid.Column="2" Content="{loc:LocalizedString GameDetails.DownloadLinks.Add}"
+                               Command="{Binding AddDownloadLinkCommand}" Padding="16,4" />
+                </Grid>
+
+                <!-- Manual -->
+                <TextBlock Text="{loc:LocalizedString GameDetails.Manual}" FontWeight="SemiBold" Margin="0,0,0,4" />
+                <TextBlock Text="{loc:LocalizedString GameDetails.Manual.NoManual}" Opacity="0.6" Margin="0,0,0,8">
+                    <TextBlock.Style>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="Visibility" Value="Collapsed" />
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding ManualRelativePath}" Value="{x:Null}">
+                                    <Setter Property="Visibility" Value="Visible" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </TextBlock.Style>
+                </TextBlock>
+                <StackPanel Orientation="Horizontal" Margin="0,0,0,20">
+                    <ui:Button Content="{loc:LocalizedString GameDetails.Manual.Open}" Command="{Binding OpenManualCommand}"
+                               Margin="0,0,8,0" Padding="16,8"
+                               Visibility="{Binding ManualRelativePath, Converter={StaticResource NullToVisibilityConverter}}" />
+                    <ui:Button Content="{loc:LocalizedString GameDetails.Manual.Import}" Click="OnImportManualClick" Padding="16,8" />
+                </StackPanel>
+
+                <!-- Play history -->
+                <TextBlock Text="{loc:LocalizedString GameDetails.PlayHistory}" FontWeight="SemiBold" Margin="0,0,0,4" />
+                <Grid Margin="0,0,0,8">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <StackPanel Grid.Column="0">
+                        <TextBlock Text="{loc:LocalizedString GameDetails.PlayHistory.TotalPlayTime}" FontSize="11" Opacity="0.6" />
+                        <TextBlock Text="{Binding TotalPlayTimeDisplay}" FontSize="14" />
+                    </StackPanel>
+                    <StackPanel Grid.Column="1">
+                        <TextBlock Text="{loc:LocalizedString GameDetails.PlayHistory.SessionCount}" FontSize="11" Opacity="0.6" />
+                        <TextBlock Text="{Binding SessionCount}" FontSize="14" />
+                    </StackPanel>
+                </Grid>
+                <TextBlock Text="{loc:LocalizedString GameDetails.PlayHistory.NoHistory}" Opacity="0.6">
+                    <TextBlock.Style>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="Visibility" Value="Collapsed" />
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding PlayHistory.Count}" Value="0">
+                                    <Setter Property="Visibility" Value="Visible" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </TextBlock.Style>
+                </TextBlock>
+                <ItemsControl ItemsSource="{Binding PlayHistory}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock Margin="0,2">
+                                <Run Text="{Binding StartedAt, StringFormat='{}{0:yyyy-MM-dd HH:mm}'}" />
+                                <Run Text=" — " />
+                                <Run Text="{Binding DurationSeconds, StringFormat='{}{0}s'}" />
+                            </TextBlock>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </StackPanel>
+        </ScrollViewer>
+
+        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="24,8,24,16">
+            <ui:Button Content="{loc:LocalizedString GameDetails.Close}" Click="OnCloseClick" Padding="20,8" />
+        </StackPanel>
+    </Grid>
+</ui:FluentWindow>

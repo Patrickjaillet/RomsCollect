@@ -1,0 +1,57 @@
+# ---------------------------------------------------------------------------
+# RomsCollect - .gitignore
+# ---------------------------------------------------------------------------
+
+# Fichiers internes de suivi de projet / IA (non versionnés, cf. contraintes)
+ROADMAP.md
+CLAUDE.md
+MEMOIRE.md
+
+# .NET / Visual Studio
+bin/
+obj/
+*.user
+*.suo
+.vs/
+*.userprefs
+*.vspscc
+*.vssscc
+
+# Résultats de build / publication portable
+publish/
+dist/
+release/
+artifacts/
+
+# Données utilisateur générées au runtime (ne pas versionner le contenu,
+# seule l'arborescence est conservée via les fichiers .gitkeep)
+data/Database/*.db
+data/Database/*.db-shm
+data/Database/*.db-wal
+data/Logs/*.log
+data/Backup/*
+data/Screenshots/*.png
+data/Screenshots/*.jpg
+!data/**/.gitkeep
+
+# ROMs et médias réels des utilisateurs (le dépôt ne distribue aucune ROM)
+data/Roms/**/*
+data/Media/**/*
+!data/Roms/**/.gitkeep
+!data/Media/**/.gitkeep
+data/emulators/**/*
+
+# Tests / couverture
+TestResults/
+coverage/*.xml
+coverage/*.info
+
+# Éditeurs / OS
+.idea/
+*.DS_Store
+Thumbs.db
+
+# Secrets locaux éventuels (aucun ne doit exister, rappel défensif)
+*.pfx
+*.pem
+appsettings.local.json

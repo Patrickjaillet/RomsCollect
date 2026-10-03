@@ -1,0 +1,57 @@
+<!-- SPDX-License-Identifier: GPL-3.0-or-later -->
+<UserControl x:Class="RomsCollect.Views.Controls.SystemListItemControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="clr-namespace:RomsCollect.ViewModels"
+             xmlns:conv="clr-namespace:RomsCollect.Converters"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             mc:Ignorable="d"
+             d:DataContext="{d:DesignInstance Type=vm:SystemListItemViewModel}">
+    <UserControl.Resources>
+        <conv:NullToVisibilityConverter x:Key="NullToVisibilityConverter" />
+        <conv:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+    </UserControl.Resources>
+    <!--
+        The selection accent bar itself is drawn by the parent ListBoxItem's
+        ItemContainerStyle (see the Sidebar ListBox in MainWindow.xaml), since
+        it depends on IsSelected, which belongs to the container.
+    -->
+    <Grid Height="34" Margin="12,0">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="Auto" />
+        </Grid.ColumnDefinitions>
+
+        <Image Grid.Column="0"
+               Source="{Binding IconFullPath}"
+               Width="18" Height="18"
+               Margin="0,0,8,0"
+               VerticalAlignment="Center"
+               Visibility="{Binding IconFullPath, Converter={StaticResource NullToVisibilityConverter}}" />
+
+        <TextBlock Grid.Column="1"
+                   Text="{Binding DisplayName}"
+                   VerticalAlignment="Center"
+                   TextTrimming="CharacterEllipsis" />
+
+        <TextBlock Grid.Column="2"
+                   Text="{Binding GameCount}"
+                   VerticalAlignment="Center"
+                   Opacity="0.6"
+                   FontSize="12"
+                   Margin="8,0,0,0"
+                   Visibility="{Binding ShowGameCount, Converter={StaticResource BooleanToVisibilityConverter}}" />
+
+        <Button Grid.Column="3"
+                Content="✕"
+                Padding="4,0"
+                Margin="8,0,0,0"
+                Background="Transparent" BorderThickness="0"
+                Visibility="{Binding IsUserCollection, Converter={StaticResource BooleanToVisibilityConverter}}"
+                Command="{Binding DataContext.RemoveCollectionCommand, RelativeSource={RelativeSource AncestorType=ListBox}}"
+                CommandParameter="{Binding}" />
+    </Grid>
+</UserControl>

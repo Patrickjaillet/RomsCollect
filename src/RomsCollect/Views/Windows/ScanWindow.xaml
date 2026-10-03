@@ -1,0 +1,126 @@
+<!-- SPDX-License-Identifier: GPL-3.0-or-later -->
+<ui:FluentWindow x:Class="RomsCollect.Views.Windows.ScanWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:vm="clr-namespace:RomsCollect.ViewModels"
+        xmlns:loc="clr-namespace:RomsCollect.Helpers"
+        xmlns:conv="clr-namespace:RomsCollect.Converters"
+        xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+        mc:Ignorable="d"
+        Title="{loc:LocalizedString Scan.Title}"
+        Height="560" Width="640"
+        WindowStartupLocation="CenterOwner"
+        ExtendsContentIntoTitleBar="True"
+        WindowBackdropType="Mica"
+        d:DataContext="{d:DesignInstance Type=vm:ScanViewModel}">
+    <ui:FluentWindow.Resources>
+        <conv:InverseBooleanConverter x:Key="InverseBooleanConverter" />
+        <conv:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+    </ui:FluentWindow.Resources>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <ui:TitleBar Grid.Row="0" Title="{loc:LocalizedString Scan.Title}" />
+
+        <!-- Scan trigger row: scan everything, or a single selected system. -->
+        <Grid Grid.Row="1" Margin="24,12,24,4" IsEnabled="{Binding IsScanning, Converter={StaticResource InverseBooleanConverter}}">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+
+            <ComboBox Grid.Column="0"
+                      ItemsSource="{Binding Systems}"
+                      SelectedItem="{Binding SelectedSystem}"
+                      DisplayMemberPath="Name"
+                      Margin="0,0,8,0" />
+
+            <ui:Button Grid.Column="1"
+                       Content="{loc:LocalizedString Scan.SelectedSystemOnly}"
+                       Command="{Binding ScanSelectedSystemCommand}"
+                       Padding="12,6" Margin="0,0,8,0" />
+
+            <ui:Button Grid.Column="2"
+                       Content="{loc:LocalizedString Scan.AllSystems}"
+                       Command="{Binding ScanAllCommand}"
+                       Appearance="Primary"
+                       Padding="12,6" />
+        </Grid>
+
+        <!-- Progress feedback: visible only while a scan is running, never a frozen UI. -->
+        <StackPanel Grid.Row="2" Margin="24,8,24,4" Visibility="{Binding IsScanning, Converter={StaticResource BooleanToVisibilityConverter}}">
+            <ProgressBar IsIndeterminate="True" Height="4" Margin="0,0,0,6" />
+            <TextBlock Text="{Binding CurrentSystemKey, Mode=OneWay}" Opacity="0.8" />
+        </StackPanel>
+
+        <!-- Report: four categories (Added/Updated/Unchanged/Errors), nothing committed until the user confirms. -->
+        <ScrollViewer Grid.Row="3" Margin="24,4,24,4" Visibility="{Binding HasReport, Converter={StaticResource BooleanToVisibilityConverter}}">
+            <StackPanel>
+                <TextBlock Margin="0,8,0,4" FontWeight="SemiBold">
+                    <Run Text="{loc:LocalizedString Scan.Added}" /><Run Text=" (" /><Run Text="{Binding AddedCount, Mode=OneWay}" /><Run Text=")" />
+                </TextBlock>
+                <ItemsControl ItemsSource="{Binding Added}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding RelativeRomPath}" Opacity="0.85" />
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+
+                <TextBlock Margin="0,16,0,4" FontWeight="SemiBold">
+                    <Run Text="{loc:LocalizedString Scan.Updated}" /><Run Text=" (" /><Run Text="{Binding UpdatedCount, Mode=OneWay}" /><Run Text=")" />
+                </TextBlock>
+                <ItemsControl ItemsSource="{Binding Updated}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding RelativeRomPath}" Opacity="0.85" />
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+
+                <TextBlock Margin="0,16,0,4" FontWeight="SemiBold">
+                    <Run Text="{loc:LocalizedString Scan.Unchanged}" /><Run Text=" (" /><Run Text="{Binding UnchangedCount, Mode=OneWay}" /><Run Text=")" />
+                </TextBlock>
+
+                <TextBlock Margin="0,16,0,4" FontWeight="SemiBold">
+                    <Run Text="{loc:LocalizedString Scan.Errors}" /><Run Text=" (" /><Run Text="{Binding ErrorsCount, Mode=OneWay}" /><Run Text=")" />
+                </TextBlock>
+                <ItemsControl ItemsSource="{Binding Errors}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock Opacity="0.85">
+                                <Run Text="{Binding RelativeRomPath, Mode=OneWay}" />
+                                <Run Text=" — " />
+                                <Run Text="{Binding Message, Mode=OneWay}" Foreground="OrangeRed" />
+                            </TextBlock>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </StackPanel>
+        </ScrollViewer>
+
+        <StackPanel Grid.Row="4" Orientation="Horizontal" HorizontalAlignment="Right" Margin="24,8,24,16">
+            <TextBlock Text="{loc:LocalizedString Scan.Committed}"
+                       VerticalAlignment="Center"
+                       Margin="0,0,12,0"
+                       Opacity="0.8"
+                       Visibility="{Binding IsCommitted, Converter={StaticResource BooleanToVisibilityConverter}}" />
+            <ui:Button Content="{loc:LocalizedString Scan.Commit}"
+                       Command="{Binding CommitCommand}"
+                       Appearance="Primary"
+                       Padding="20,8" Margin="0,0,8,0"
+                       IsEnabled="{Binding HasReport}"
+                       Visibility="{Binding IsCommitted, Converter={StaticResource BooleanToVisibilityConverter}, ConverterParameter=Invert}" />
+            <ui:Button Content="{loc:LocalizedString Scan.Close}" Click="OnCloseClick" Padding="20,8" />
+        </StackPanel>
+    </Grid>
+</ui:FluentWindow>

@@ -1,0 +1,76 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net10.0-windows7.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UseWPF>true</UseWPF>
+    <SupportedOSPlatformVersion>7.0</SupportedOSPlatformVersion>
+    <LangVersion>latest</LangVersion>
+    <RootNamespace>RomsCollect</RootNamespace>
+    <AssemblyName>RomsCollect</AssemblyName>
+
+    <RuntimeIdentifiers>win-x64</RuntimeIdentifiers>
+    <SelfContained>true</SelfContained>
+    <PublishSingleFile>true</PublishSingleFile>
+    <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
+    <InvariantGlobalization>false</InvariantGlobalization>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+
+    <Product>RomsCollect</Product>
+    <Company>SANDEFJORD / Patrick JAILLET</Company>
+    <Copyright>© 2026 SANDEFJORD / Patrick JAILLET</Copyright>
+
+    <ApplicationIcon>Assets\icon\RomsCollect.ico</ApplicationIcon>
+  </PropertyGroup>
+
+  <!--
+    En configuration Release, on ne genere pas de PDB : par defaut le
+    compilateur y embarque le chemin source complet de la machine de
+    build (ex. C:\Users\<nom>\...), ce qui fuiterait le nom d'utilisateur
+    Windows dans l'archive portable livree. Aucun impact fonctionnel :
+    seules les traces de pile de debogage perdent en detail ; l'app
+    Debug locale continue de generer un PDB normalement.
+  -->
+  <PropertyGroup Condition="'$(Configuration)'=='Release'">
+    <DebugType>none</DebugType>
+    <DebugSymbols>false</DebugSymbols>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.2" />
+    <PackageReference Include="Dapper" Version="2.1.89" />
+    <PackageReference Include="Microsoft.Data.Sqlite" Version="10.0.12" />
+    <PackageReference Include="WPF-UI" Version="4.3.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="i18n\**\*.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+  <!--
+    Assets portables : copiés à côté de l'exécutable (assets/png/logo.png,
+    assets/icon/RomsCollect.ico), et non embarqués dans l'assembly, pour que
+    la fenêtre "À propos" (AboutWindow.xaml.cs) puisse les lire au runtime via
+    un chemin relatif à AppContext.BaseDirectory, conformément à la
+    contrainte 100 % portable (voir ROADMAP.md).
+  -->
+  <ItemGroup>
+    <None Update="Assets\png\logo.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Link>assets\png\logo.png</Link>
+    </None>
+    <None Update="Assets\icon\RomsCollect.ico">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Link>assets\icon\RomsCollect.ico</Link>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Data\Migrations\*.sql" />
+  </ItemGroup>
+
+</Project>

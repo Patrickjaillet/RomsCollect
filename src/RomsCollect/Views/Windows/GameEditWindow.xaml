@@ -1,0 +1,337 @@
+<!-- SPDX-License-Identifier: GPL-3.0-or-later -->
+<ui:FluentWindow x:Class="RomsCollect.Views.Windows.GameEditWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:vm="clr-namespace:RomsCollect.ViewModels"
+        xmlns:loc="clr-namespace:RomsCollect.Helpers"
+        xmlns:conv="clr-namespace:RomsCollect.Converters"
+        xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+        mc:Ignorable="d"
+        Title="{loc:LocalizedString GameEdit.Title}"
+        Height="680" Width="640"
+        WindowStartupLocation="CenterOwner"
+        ExtendsContentIntoTitleBar="True"
+        WindowBackdropType="Mica"
+        d:DataContext="{d:DesignInstance Type=vm:GameEditViewModel}">
+    <ui:FluentWindow.Resources>
+        <conv:NullToVisibilityConverter x:Key="NullToVisibilityConverter" />
+        <conv:StringEqualsConverter x:Key="StringEqualsConverter" />
+    </ui:FluentWindow.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <ui:TitleBar Grid.Row="0" Title="{loc:LocalizedString GameEdit.Title}" />
+
+        <TabControl Grid.Row="1" Margin="16">
+            <!-- Main tab -->
+            <TabItem Header="{loc:LocalizedString GameEdit.Tab.Main}">
+                <ScrollViewer>
+                    <StackPanel Margin="8">
+                        <TextBlock Text="{loc:LocalizedString GameEdit.Main.Title}" Margin="0,8,0,4" />
+                        <ui:TextBox Text="{Binding Title, UpdateSourceTrigger=PropertyChanged}" />
+
+                        <TextBlock Text="{loc:LocalizedString GameEdit.Main.SortTitle}" Margin="0,12,0,4" />
+                        <ui:TextBox Text="{Binding SortTitle, UpdateSourceTrigger=PropertyChanged}" />
+
+                        <TextBlock Text="{loc:LocalizedString GameEdit.Main.Platform}" Margin="0,12,0,4" />
+                        <ComboBox ItemsSource="{Binding AvailableSystems}" SelectedItem="{Binding SelectedSystem}" DisplayMemberPath="Name" />
+
+                        <TextBlock Text="{loc:LocalizedString GameEdit.Main.ReleaseDate}" Margin="0,12,0,4" />
+                        <ui:TextBox Text="{Binding ReleaseDate, UpdateSourceTrigger=PropertyChanged}" />
+
+                        <TextBlock Text="{loc:LocalizedString GameEdit.Main.Completeness}" Margin="0,12,0,4" />
+                        <StackPanel Orientation="Horizontal">
+                            <RadioButton Content="{loc:LocalizedString GameEdit.Main.Completeness.Loose}" GroupName="Completeness"
+                                         IsChecked="{Binding Completeness, Converter={StaticResource StringEqualsConverter}, ConverterParameter=Loose}" Margin="0,0,16,0" />
+                            <RadioButton Content="{loc:LocalizedString GameEdit.Main.Completeness.CIB}" GroupName="Completeness"
+                                         IsChecked="{Binding Completeness, Converter={StaticResource StringEqualsConverter}, ConverterParameter=CIB}" Margin="0,0,16,0" />
+                            <RadioButton Content="{loc:LocalizedString GameEdit.Main.Completeness.New}" GroupName="Completeness"
+                                         IsChecked="{Binding Completeness, Converter={StaticResource StringEqualsConverter}, ConverterParameter=New}" />
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
+                            <CheckBox Content="{loc:LocalizedString GameEdit.Main.HasBox}" IsChecked="{Binding HasBox}" Margin="0,0,24,0" />
+                            <CheckBox Content="{loc:LocalizedString GameEdit.Main.HasManual}" IsChecked="{Binding HasManual}" />
+                        </StackPanel>
+
+                        <TextBlock Text="{loc:LocalizedString GameEdit.Main.Barcode}" Margin="0,12,0,4" />
+                        <ui:TextBox Text="{Binding Barcode, UpdateSourceTrigger=PropertyChanged}" />
+
+                        <TextBlock Text="{loc:LocalizedString GameEdit.Main.Format}" Margin="0,12,0,4" />
+                        <ComboBox ItemsSource="{Binding AvailableFormats}" Text="{Binding Format, UpdateSourceTrigger=PropertyChanged}" IsEditable="True" />
+
+                        <TextBlock Text="{loc:LocalizedString GameEdit.Main.Edition}" Margin="0,12,0,4" />
+                        <ui:TextBox Text="{Binding Edition, UpdateSourceTrigger=PropertyChanged}" />
+
+                        <TextBlock Text="{loc:LocalizedString GameEdit.Main.Region}" Margin="0,12,0,4" />
+                        <ui:TextBox Text="{Binding Region, UpdateSourceTrigger=PropertyChanged}" />
+
+                        <TextBlock Text="{loc:LocalizedString GameEdit.Main.Series}" Margin="0,12,0,4" />
+                        <ui:TextBox Text="{Binding Series, UpdateSourceTrigger=PropertyChanged}" />
+
+                        <TextBlock Text="{loc:LocalizedString GameEdit.Main.AudienceRating}" Margin="0,12,0,4" />
+                        <ui:TextBox Text="{Binding AudienceRating, UpdateSourceTrigger=PropertyChanged}" />
+
+                        <TextBlock Text="{loc:LocalizedString GameEdit.Main.PlayMode}" Margin="0,12,0,4" />
+                        <ui:TextBox Text="{Binding PlayMode, UpdateSourceTrigger=PropertyChanged}" />
+
+                        <CheckBox Content="{loc:LocalizedString GameEdit.Main.IsPortable}" IsChecked="{Binding IsPortable}" Margin="0,12,0,0" />
+
+                        <TextBlock Text="{loc:LocalizedString GameEdit.Main.Developers}" FontWeight="SemiBold" Margin="0,16,0,4" />
+                        <ItemsControl ItemsSource="{Binding Developers}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Grid Margin="0,2">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="Auto" />
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Grid.Column="0" Text="{Binding}" VerticalAlignment="Center" />
+                                        <ui:Button Grid.Column="1" Content="✕" Padding="8,2"
+                                                   Command="{Binding DataContext.RemoveDeveloperCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                                   CommandParameter="{Binding}" />
+                                    </Grid>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                        <Grid Margin="0,4,0,0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <ui:TextBox Grid.Column="0" Text="{Binding NewDeveloperName, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,4,0" />
+                            <ui:Button Grid.Column="1" Content="{loc:LocalizedString GameEdit.Add}" Command="{Binding AddDeveloperCommand}" Padding="16,4" />
+                        </Grid>
+
+                        <TextBlock Text="{loc:LocalizedString GameEdit.Main.Publishers}" FontWeight="SemiBold" Margin="0,16,0,4" />
+                        <ItemsControl ItemsSource="{Binding Publishers}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Grid Margin="0,2">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="Auto" />
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Grid.Column="0" Text="{Binding}" VerticalAlignment="Center" />
+                                        <ui:Button Grid.Column="1" Content="✕" Padding="8,2"
+                                                   Command="{Binding DataContext.RemovePublisherCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                                   CommandParameter="{Binding}" />
+                                    </Grid>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                        <Grid Margin="0,4,0,0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <ui:TextBox Grid.Column="0" Text="{Binding NewPublisherName, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,4,0" />
+                            <ui:Button Grid.Column="1" Content="{loc:LocalizedString GameEdit.Add}" Command="{Binding AddPublisherCommand}" Padding="16,4" />
+                        </Grid>
+
+                        <TextBlock Text="{loc:LocalizedString GameEdit.Main.Genres}" FontWeight="SemiBold" Margin="0,16,0,4" />
+                        <ItemsControl ItemsSource="{Binding Genres}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Grid Margin="0,2">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="Auto" />
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Grid.Column="0" Text="{Binding}" VerticalAlignment="Center" />
+                                        <ui:Button Grid.Column="1" Content="✕" Padding="8,2"
+                                                   Command="{Binding DataContext.RemoveGenreCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                                   CommandParameter="{Binding}" />
+                                    </Grid>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                        <Grid Margin="0,4,0,16">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <ComboBox Grid.Column="0" ItemsSource="{Binding AvailableGenres}" Text="{Binding NewGenreName, UpdateSourceTrigger=PropertyChanged}" IsEditable="True" Margin="0,0,4,0" />
+                            <ui:Button Grid.Column="1" Content="{loc:LocalizedString GameEdit.Add}" Command="{Binding AddGenreCommand}" Padding="16,4" />
+                        </Grid>
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
+
+            <!-- Personal tab -->
+            <TabItem Header="{loc:LocalizedString GameEdit.Tab.Personal}">
+                <ScrollViewer>
+                    <StackPanel Margin="8">
+                        <TextBlock Text="{loc:LocalizedString GameEdit.Personal.Condition}" Margin="0,8,0,4" />
+                        <ui:TextBox Text="{Binding Condition, UpdateSourceTrigger=PropertyChanged}" />
+
+                        <TextBlock Text="{loc:LocalizedString GameEdit.Personal.Owner}" Margin="0,12,0,4" />
+                        <ui:TextBox Text="{Binding Owner, UpdateSourceTrigger=PropertyChanged}" />
+
+                        <TextBlock Text="{loc:LocalizedString GameEdit.Personal.PurchaseDate}" Margin="0,12,0,4" />
+                        <ui:TextBox Text="{Binding PurchaseDate, UpdateSourceTrigger=PropertyChanged}" />
+
+                        <TextBlock Text="{loc:LocalizedString GameEdit.Personal.PurchaseStore}" Margin="0,12,0,4" />
+                        <ui:TextBox Text="{Binding PurchaseStore, UpdateSourceTrigger=PropertyChanged}" />
+
+                        <TextBlock Text="{loc:LocalizedString GameEdit.Personal.StorageDevice}" Margin="0,12,0,4" />
+                        <ui:TextBox Text="{Binding StorageDevice, UpdateSourceTrigger=PropertyChanged}" />
+
+                        <TextBlock Text="{loc:LocalizedString GameEdit.Personal.StorageSlot}" Margin="0,12,0,4" />
+                        <ui:TextBox Text="{Binding StorageSlot, UpdateSourceTrigger=PropertyChanged}" />
+
+                        <TextBlock Text="{loc:LocalizedString GameEdit.Personal.PurchasePrice}" Margin="0,12,0,4" />
+                        <ui:TextBox Text="{Binding PurchasePrice, UpdateSourceTrigger=PropertyChanged}" />
+
+                        <TextBlock Text="{loc:LocalizedString GameEdit.Personal.CurrentValue}" Margin="0,12,0,4" />
+                        <ui:TextBox Text="{Binding CurrentValue, UpdateSourceTrigger=PropertyChanged}" />
+
+                        <StackPanel Orientation="Horizontal" Margin="0,16,0,0">
+                            <CheckBox Content="{loc:LocalizedString GameEdit.Personal.Completed}" IsChecked="{Binding Completed}" />
+                        </StackPanel>
+
+                        <TextBlock Text="{loc:LocalizedString GameEdit.Personal.CompletedDate}" Margin="0,12,0,4" />
+                        <ui:TextBox Text="{Binding CompletedDate, UpdateSourceTrigger=PropertyChanged}" />
+
+                        <TextBlock Text="{loc:LocalizedString GameEdit.Personal.Notes}" Margin="0,12,0,4" />
+                        <ui:TextBox Text="{Binding Notes, UpdateSourceTrigger=PropertyChanged}" AcceptsReturn="True" Height="60" TextWrapping="Wrap" />
+
+                        <TextBlock Text="{loc:LocalizedString GameEdit.Personal.Rating}" Margin="0,12,0,4" />
+                        <Slider Minimum="0" Maximum="10" TickFrequency="1" IsSnapToTickEnabled="True" Value="{Binding Rating}" />
+
+                        <TextBlock Text="{loc:LocalizedString GameEdit.Personal.Tags}" FontWeight="SemiBold" Margin="0,16,0,4" />
+                        <ItemsControl ItemsSource="{Binding Tags}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Grid Margin="0,2">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="Auto" />
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Grid.Column="0" Text="{Binding}" VerticalAlignment="Center" />
+                                        <ui:Button Grid.Column="1" Content="✕" Padding="8,2"
+                                                   Command="{Binding DataContext.RemoveTagCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                                   CommandParameter="{Binding}" />
+                                    </Grid>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                        <Grid Margin="0,4,0,0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <ui:TextBox Grid.Column="0" Text="{Binding NewTagName, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,4,0" />
+                            <ui:Button Grid.Column="1" Content="{loc:LocalizedString GameEdit.Add}" Command="{Binding AddTagCommand}" Padding="16,4" />
+                        </Grid>
+
+                        <TextBlock Text="{loc:LocalizedString GameEdit.Personal.CollectionStatus}" Margin="0,16,0,4" />
+                        <ComboBox SelectedItem="{Binding CollectionStatus}">
+                            <ComboBoxItem Content="{loc:LocalizedString GameEdit.Personal.CollectionStatus.InCollection}" />
+                            <ComboBoxItem Content="{loc:LocalizedString GameEdit.Personal.CollectionStatus.Wanted}" />
+                            <ComboBoxItem Content="{loc:LocalizedString GameEdit.Personal.CollectionStatus.Sold}" />
+                            <ComboBoxItem Content="{loc:LocalizedString GameEdit.Personal.CollectionStatus.OnLoan}" />
+                        </ComboBox>
+
+                        <Grid Margin="0,12,0,0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <StackPanel Grid.Column="0" Margin="0,0,4,0">
+                                <TextBlock Text="{loc:LocalizedString GameEdit.Personal.SortIndex}" Margin="0,0,0,4" />
+                                <ui:TextBox Text="{Binding SortIndex, UpdateSourceTrigger=PropertyChanged}" />
+                            </StackPanel>
+                            <StackPanel Grid.Column="1" Margin="4,0,0,0">
+                                <TextBlock Text="{loc:LocalizedString GameEdit.Personal.Quantity}" Margin="0,0,0,4" />
+                                <ui:TextBox Text="{Binding Quantity, UpdateSourceTrigger=PropertyChanged}" />
+                            </StackPanel>
+                        </Grid>
+
+                        <TextBlock Text="{loc:LocalizedString GameEdit.Personal.Location}" Margin="0,12,0,16" />
+                        <ui:TextBox Text="{Binding Location, UpdateSourceTrigger=PropertyChanged}" />
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
+
+            <!-- Cover tab -->
+            <TabItem Header="{loc:LocalizedString GameEdit.Tab.Cover}">
+                <StackPanel Margin="8" HorizontalAlignment="Center">
+                    <Border Width="300" Height="300" Margin="0,16"
+                            Background="{DynamicResource ControlFillColorDefaultBrush}"
+                            CornerRadius="6" ClipToBounds="True">
+                        <Grid>
+                            <Image Source="{Binding CoverImagePath}" Stretch="Uniform"
+                                   Visibility="{Binding CoverImagePath, Converter={StaticResource NullToVisibilityConverter}}" />
+                            <TextBlock Text="{loc:LocalizedString GameEdit.Cover.NoImage}"
+                                       HorizontalAlignment="Center" VerticalAlignment="Center"
+                                       Opacity="0.6" TextWrapping="Wrap" TextAlignment="Center" Margin="16">
+                                <TextBlock.Style>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="Visibility" Value="Collapsed" />
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding CoverImagePath}" Value="{x:Null}">
+                                                <Setter Property="Visibility" Value="Visible" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </TextBlock.Style>
+                            </TextBlock>
+                        </Grid>
+                    </Border>
+                    <ui:Button Content="{loc:LocalizedString GameEdit.Cover.Import}" Click="OnImportCoverClick" Padding="20,8" />
+                </StackPanel>
+            </TabItem>
+
+            <!-- Description tab -->
+            <TabItem Header="{loc:LocalizedString GameEdit.Tab.Description}">
+                <Grid Margin="8">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+
+                    <!-- Minimal lightweight markup, stored as plain text:
+                         **bold**, *italic*, "- " bullet lines. No HTML/RTF
+                         dependency, kept intentionally simple. -->
+                    <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,8">
+                        <ui:Button Content="B" FontWeight="Bold" Click="OnDescriptionBoldClick" Padding="10,4" Margin="0,0,4,0" ToolTip="{loc:LocalizedString GameEdit.Description.BoldTooltip}" />
+                        <ui:Button Content="I" FontStyle="Italic" Click="OnDescriptionItalicClick" Padding="10,4" Margin="0,0,4,0" ToolTip="{loc:LocalizedString GameEdit.Description.ItalicTooltip}" />
+                        <ui:Button Content="•" Click="OnDescriptionBulletClick" Padding="10,4" ToolTip="{loc:LocalizedString GameEdit.Description.BulletTooltip}" />
+                    </StackPanel>
+
+                    <ui:TextBox x:Name="DescriptionTextBox"
+                                Grid.Row="1"
+                                Text="{Binding Description, UpdateSourceTrigger=PropertyChanged}"
+                                PlaceholderText="{loc:LocalizedString GameEdit.Description.Placeholder}"
+                                AcceptsReturn="True" TextWrapping="Wrap"
+                                VerticalContentAlignment="Top" />
+                </Grid>
+            </TabItem>
+        </TabControl>
+
+        <Grid Grid.Row="2" Margin="16">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+
+            <StackPanel Grid.Column="0" Orientation="Horizontal">
+                <ui:Button Content="{loc:LocalizedString GameEdit.Previous}" Command="{Binding NavigatePreviousCommand}" Margin="0,0,8,0" Padding="16,8" />
+                <ui:Button Content="{loc:LocalizedString GameEdit.Next}" Command="{Binding NavigateNextCommand}" Padding="16,8" />
+            </StackPanel>
+
+            <StackPanel Grid.Column="2" Orientation="Horizontal">
+                <ui:Button Content="{loc:LocalizedString GameEdit.Cancel}" Click="OnCancelClick" Margin="0,0,8,0" Padding="20,8" />
+                <ui:Button Content="{loc:LocalizedString GameEdit.OK}" Appearance="Primary" Click="OnOkClick" Padding="20,8" />
+            </StackPanel>
+        </Grid>
+    </Grid>
+</ui:FluentWindow>
